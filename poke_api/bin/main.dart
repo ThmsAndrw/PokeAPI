@@ -78,8 +78,27 @@ Future<void> deletarPesquisa() async {
   final arquivo = File('../meu_backup.json');
 
   if (arquivo.existsSync()) {
-    arquivo.deleteSync();
-    print("Pesquisa deletada com sucesso.");
+    String conteudo = arquivo.readAsStringSync();
+    List<dynamic> pokemonsExistentes = jsonDecode(conteudo);
+
+    // Mostra a lista de Pokémons
+    print("Pokémons salvos:");
+    for (int i = 0; i < pokemonsExistentes.length; i++) {
+      print("$i - ${pokemonsExistentes[i]['name']}");
+    }
+
+    // Pede qual deletar
+    print("Digite o número do Pokémon a deletar: ");
+    String? indiceStr = stdin.readLineSync();
+    int? indice = int.tryParse(indiceStr ?? "");
+
+    if (indice != null && indice >= 0 && indice < pokemonsExistentes.length) {
+      pokemonsExistentes.removeAt(indice);
+      arquivo.writeAsStringSync(jsonEncode(pokemonsExistentes));
+      print("Pokémon deletado com sucesso!");
+    } else {
+      print("Índice inválido.");
+    }
   } else {
     print("Nenhuma pesquisa salva encontrada para deletar.");
   }
